@@ -58,43 +58,8 @@
       .then(response => response.json())
       .then(data => {
         statusDiv.innerHTML = '<div class="done">Done!</div>';
-        let html = '<h2>Extracted Coverage Information</h2><ul style="list-style:none;padding:0;">';
-        // Human-readable formatting
-        if (data['BodilyInjury']) {
-          html += `<li><strong>Bodily Injury:</strong><br><pre>Per Person: $${data.BodilyInjury.PerPerson.toLocaleString()}\nPer Accident: $${data.BodilyInjury.PerAccident.toLocaleString()}</pre></li>`;
-        }
-        if (data['PropertyDamage']) {
-          html += `<li><strong>Property Damage:</strong><br><pre>Per Accident: $${data.PropertyDamage.PerAccident.toLocaleString()}</pre></li>`;
-        }
-        if (data['PersonalInjuryProtection']) {
-          html += `<li><strong>Personal Injury Protection:</strong><br><pre>$${data.PersonalInjuryProtection.toLocaleString()}</pre></li>`;
-        }
-        if (data['UninsuredMotorist']) {
-          html += `<li><strong>Uninsured Motorist:</strong><br><pre>Per Person: $${data.UninsuredMotorist.PerPerson.toLocaleString()}\nPer Accident: $${data.UninsuredMotorist.PerAccident.toLocaleString()}</pre></li>`;
-        }
-        if (data['ComprehensiveDeductible']) {
-          html += `<li><strong>Comprehensive Deductible:</strong><br><pre>$${data.ComprehensiveDeductible.toLocaleString()}</pre></li>`;
-        }
-        if (data['CollisionDeductible']) {
-          html += `<li><strong>Collision Deductible:</strong><br><pre>$${data.CollisionDeductible.toLocaleString()}</pre></li>`;
-        }
-        if (data['RentalReimbursement']) {
-          html += `<li><strong>Rental Reimbursement:</strong><br><pre>Per Day: $${data.RentalReimbursement.PerDay.toLocaleString()}\nMax Days: ${data.RentalReimbursement.MaxDays}</pre></li>`;
-        }
-        if (data['Drivers']) {
-          data.Drivers.forEach((driver, i) => {
-            html += `<li><strong>Driver ${i+1}:</strong><br><pre>First Name: ${driver.FirstName}\nLast Name: ${driver.LastName}</pre></li>`;
-          });
-        }
-        if (data['Vehicles']) {
-          data.Vehicles.forEach((vehicle, i) => {
-            html += `<li><strong>Vehicle ${i+1}:</strong><br><pre>` +
-              `Year: ${vehicle.Year}\nMake: ${vehicle.Make}\nModel: ${vehicle.Model}\n` +
-              `VIN: ${vehicle.VIN || ''}\nGaraging ZIP: ${vehicle.GaragingZIP || ''}\nPrimary Use: ${vehicle.PrimaryUse || ''}\nAnnual Miles: ${vehicle.AnnualMiles || ''}\nOwnership Length: ${vehicle.OwnershipLength || ''}` +
-              `</pre></li>`;
-          });
-        }
-        html += '</ul>';
+        let html = '<h2>Extracted Auto Policy Information</h2>';
+        html += `<pre>${JSON.stringify(data, null, 2)}</pre>`;
         resultDiv.innerHTML = html;
         resultDiv.style.display = 'block';
         continueBtn.disabled = false;
