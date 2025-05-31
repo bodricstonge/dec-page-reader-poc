@@ -67,6 +67,11 @@ def extract_coverage(text):
             m = dollar_pattern.findall(line)
             if m:
                 result['PersonalInjuryProtection'] = round_100(int(m[0].replace(',', '')))
+        # Medical Payments (separate from PIP)
+        elif 'medical payments' in l or 'medical payment' in l or 'medpay' in l:
+            m = dollar_pattern.findall(line)
+            if m:
+                result['MedicalPayments'] = round_100(int(m[0].replace(',', '')))
         # Rental Reimbursement
         elif 'rental reimbursement' in l:
             rent_match = re.search(r'\$([\d,]+) each day/maximum (\d+) days', line, re.IGNORECASE)
