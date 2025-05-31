@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Auto Insurance Declaration Page Reader</title>
+  <style>
+    body { font-family: Arial, sans-serif; background: #f7f7f7; margin: 0; padding: 0; }
+    .container { max-width: 600px; margin: 40px auto; background: #fff; border-radius: 8px; box-shadow: 0 2px 8px #0001; padding: 32px; }
+    h1 { text-align: center; color: #2c3e50; }
+    .upload-section { margin-bottom: 24px; }
+    .loading { text-align: center; font-size: 1.2em; color: #2980b9; }
+    .done { text-align: center; font-size: 1.2em; color: #27ae60; }
+    .result { background: #f4f8fb; border-radius: 6px; padding: 20px; margin-top: 24px; }
+    .result h2 { margin-top: 0; color: #2c3e50; }
+    .result pre { background: #eaf1f7; border-radius: 4px; padding: 12px; overflow-x: auto; }
+    label { display: block; margin-bottom: 8px; }
+    input[type="file"] { margin-bottom: 16px; }
+    button { background: #2980b9; color: #fff; border: none; padding: 12px 28px; border-radius: 4px; font-size: 1em; cursor: pointer; }
+    button:disabled { background: #b2bec3; cursor: not-allowed; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Auto Insurance Declaration Page Reader</h1>
+    <div class="upload-section">
+      <label for="fileInput">Upload your declaration page (PDF or TXT):</label>
+      <input type="file" id="fileInput" accept=".pdf,.txt" />
+      <button id="continueBtn" disabled>Continue</button>
+    </div>
+    <div id="status"></div>
+    <div id="result" class="result" style="display:none;"></div>
+  </div>
+  <script>
+    const fileInput = document.getElementById('fileInput');
+    const continueBtn = document.getElementById('continueBtn');
+    const statusDiv = document.getElementById('status');
+    const resultDiv = document.getElementById('result');
+
+    let file;
+    fileInput.addEventListener('change', (e) => {
+      file = e.target.files[0];
+      continueBtn.disabled = !file;
+      statusDiv.textContent = '';
+      resultDiv.style.display = 'none';
+    });
+
+    continueBtn.addEventListener('click', () => {
+      if (!file) return;
+      statusDiv.innerHTML = '<div class="loading">Parsing document, please wait...</div>';
+      continueBtn.disabled = true;
+      const formData = new FormData();
+      formData.append('file', file);
+      fetch('/extract', {
+        method: 'POST',
+        body: formData
+      })
+      .then(response => response.json())
+      .then(data => {
+        statusDiv.innerHTML = '<div class="done">Done!</div>';
+        let html = '<h2>Extracted Coverage Information</h2><ul style="list-style:none;padding:0;">';
+        // Human-readable formatting
+        if (data['BodilyInjury']) {
+          html += `<li><strong>Bodily Injury:</strong><br><pre>Per Person: $${data.BodilyInjury.PerPerson.toLocaleString()}\nPer Accident: $${data.BodilyInjury.PerAccident.toLocaleString()}</pre></li>`;
+        }
+        if (data['PropertyDamage']) {
+          html += `<li><strong>Property Damage:</strong><br><pre>Per Accident: $${data.PropertyDamage.PerAccident.toLocaleString()}</pre></li>`;
+        }
+        if (data['PersonalInjuryProtection']) {
+          html += `<li><strong>Personal Injury Protection:</strong><br><pre>$${data.PersonalInjuryProtection.toLocaleString()}</pre></li>`;
+        }
+        if (data['UninsuredMotorist']) {
+          html += `<li><strong>Uninsured Motorist:</strong><br><pre>Per Person: $${data.UninsuredMotorist.PerPerson.toLocaleString()}\nPer Accident: $${data.UninsuredMotorist.PerAccident.toLocaleString()}</pre></li>`;
+        }
+        if (data['ComprehensiveDeductible']) {
+          html += `<li><strong>Comprehensive Deductible:</strong><br><pre>$${data.ComprehensiveDeductible.toLocaleString()}</pre></li>`;
+        }
+        if (data['CollisionDeductible']) {
+          html += `<li><strong>Collision Deductible:</strong><br><pre>$${data.CollisionDeductible.toLocaleString()}</pre></li>`;
+        }
+        if (data['RentalReimbursement']) {
+          html += `<li><strong>Rental Reimbursement:</strong><br><pre>Per Day: $${data.RentalReimbursement.PerDay.toLocaleString()}\nMax Days: ${data.RentalReimbursement.MaxDays}</pre></li>`;
+        }
+        if (data['Drivers']) {
+          data.Drivers.forEach((driver, i) => {
+            html += `<li><strong>Driver ${i+1}:</strong><br><pre>First Name: ${driver.FirstName}\nLast Name: ${driver.LastName}</pre></li>`;
+          });
+        }
+        if (data['Vehicles']) {
+          data.Vehicles.forEach((vehicle, i) => {
+            html += `<li><strong>Vehicle ${i+1}:</strong><br><pre>` +
+              `Year: ${vehicle.Year}\nMake: ${vehicle.Make}\nModel: ${vehicle.Model}\n` +
+              `VIN: ${vehicle.VIN || ''}\nGaraging ZIP: ${vehicle.GaragingZIP || ''}\nPrimary Use: ${vehicle.PrimaryUse || ''}\nAnnual Miles: ${vehicle.AnnualMiles || ''}\nOwnership Length: ${vehicle.OwnershipLength || ''}` +
+              `</pre></li>`;
+          });
+        }
+        html += '</ul>';
+        resultDiv.innerHTML = html;
+        resultDiv.style.display = 'block';
+        continueBtn.disabled = false;
+      })
+      .catch(() => {
+        statusDiv.innerHTML = '<div class="done" style="color:#c0392b">Error parsing document.</div>';
+        continueBtn.disabled = false;
+      });
+    });
+  </script>
+</body>
+</html>

@@ -1,0 +1,38 @@
+{
+  "BodilyInjury": {
+    "PerPerson": 250000,
+    "PerAccident": 500000
+  },
+  "PropertyDamage": {
+    "PerAccident": 100000
+  },
+  "PersonalInjuryProtection": 10000,
+  "UninsuredMotorist": {
+    "PerPerson": 100000,
+    "PerAccident": 300000
+  },
+  "ComprehensiveDeductible": 500,
+  "CollisionDeductible": 500,
+  "RentalReimbursement": {
+    "PerDay": 40,
+    "MaxDays": 30
+  },
+  "Drivers": [
+    {
+      "FirstName": "Bodric",
+      "LastName": "St Onge"
+    }
+  ],
+  "Vehicles": [
+    {
+      "Year": "2024",
+      "Make": "FORD",
+      "Model": "BRONCO SPORT 4 DOOR WAGON",
+      "VIN": "3fmcr9b65rre10696",
+      "GaragingZIP": "75039",
+      "PrimaryUse": "commute",
+      "AnnualMiles": "8,000 - 9,999",
+      "OwnershipLength": "at least 6 months but less than 1 year"
+    }
+  ]
+}
